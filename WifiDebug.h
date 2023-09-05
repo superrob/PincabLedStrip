@@ -8,15 +8,14 @@
 #include <ArduinoOTA.h>
 
 class WifiDebug {
-  public:
-    WifiDebug();
-    void begin(void);
-    void debug_send_msg(char * message);
-    void debug_send_byte(byte b);
-    void debug_send_int(int c);
-    void debug_send_word(word w);
+public:
+  WifiDebug();
+  void begin(void);
+  void debug_send_msg(char* message);
+  void debug_send_byte(byte b);
+  void debug_send_int(int c);
+  void debug_send_word(word w);
 
-  private:
-
+private:
 };
 #endif

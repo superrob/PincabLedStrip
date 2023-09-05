@@ -21,14 +21,14 @@ static WifiDebug wifidebug;
 #include "LedStrip.h"
 
 #define FirmwareVersionMajor 2
-#define FirmwareVersionMinor 1
+#define FirmwareVersionMinor 2
 
 //Defines the Pinnumber to which the built in led
 #define LedPin LED_BUILTIN
 
 #define READ_EEPROM_SETTINGS 0
 
-enum SettingsEnum{
+enum SettingsEnum {
   TEST_ON_RESET,
   TEST_SWITCH,
   ACTIVITY_LED,
@@ -41,8 +41,8 @@ enum SettingsEnum{
 };
 
 uint8_t Settings[SettingsEnum::COUNT] = {
-  1,
   0,
+  1,
   1,
   0,
   0,
@@ -51,10 +51,10 @@ uint8_t Settings[SettingsEnum::COUNT] = {
   0
 };
 
-void ReadSettings(){
+void ReadSettings() {
 #if READ_EEPROM_SETTINGS
   EEPROM.begin(SettingsEnum::COUNT);
-  for(int i = 0; i < SettingsEnum::COUNT; ++i){
+  for (int i = 0; i < SettingsEnum::COUNT; ++i) {
     Settings[i] = EEPROM.read(i);
   }
   EEPROM.end();
@@ -68,12 +68,19 @@ void ReadSettings(){
   Serial.println(Settings[SettingsEnum::ACTIVITY_LED], DEC);
 }
 
-bool HasSetting(int setting){
+bool HasSetting(int setting) {
   return Settings[setting] != 0;
 }
 
 // Defines the Pinnumber for the test button which is low when pressed
 #define TestPin D0
+
+// TEST double click settings
+long buttonTimer = 0;
+long longPressTime = 2000;
+
+boolean buttonActive = false;
+boolean longPressActive = false;
 
 //Variable used to control the blinking and flickering of the led of the Wemos
 elapsedMillis BlinkTimer;
@@ -87,7 +94,7 @@ uint32_t configuredStripLength = MaxLedsPerStrip;
 //Setup of the system. Is called once on startup.
 void setup() {
 
-  Serial.begin(2000000);//921600);
+  Serial.begin(2000000);  //921600);
   while (Serial.available()) {
     Serial.read();
   };
@@ -107,8 +114,8 @@ void setup() {
   ledstrip.begin();
   ledstrip.show();
 
-    //Initialize the led pin
-    pinMode(LedPin, OUTPUT);
+  //Initialize the led pin
+  pinMode(LedPin, OUTPUT);
   digitalWrite(LedPin, LOW);
   SetBlinkMode(0);
   Blink();
@@ -117,13 +124,13 @@ void setup() {
   wifidebug.debug_send_msg("Setup done");
 #endif
 
-  if (HasSetting(SettingsEnum::TEST_SWITCH)){
+  if (HasSetting(SettingsEnum::TEST_SWITCH)) {
     //Initialize and find value of the test pin
-    pinMode(TestPin,INPUT_PULLUP); 
-    digitalWrite(TestPin, HIGH); 
+    pinMode(TestPin, INPUT_PULLUP);
+    digitalWrite(TestPin, HIGH);
   }
 
-  if (HasSetting(SettingsEnum::TEST_ON_RESET)){
+  if (HasSetting(SettingsEnum::TEST_ON_RESET)) {
     Test();
   }
 
@@ -131,13 +138,13 @@ void setup() {
   ledstrip.show();
 }
 
-void TestLedstripColor(byte r, byte g, byte b){
+void TestLedstripColor(byte r, byte g, byte b) {
   ledstrip.clearAll();
   ledstrip.show();
   Blink();
   FastLED.delay(200);
-  for(int i = 0; i < configuredStripLength * NUMBER_LEDSTRIP; i++){
-    ledstrip.setPixel(i,r, g, b);
+  for (int i = 0; i < configuredStripLength * NUMBER_LEDSTRIP; i++) {
+    ledstrip.setPixel(i, r, g, b);
   }
   ledstrip.show();
   Blink();
@@ -152,15 +159,59 @@ void Test() {
   TestLedstripColor(0, 0, BRIGHTNESS);
 }
 
+void ChaserLedstripColor(byte r, byte g, byte b) {
+  ledstrip.clearAll();
+  ledstrip.show();
+  Blink();
+  FastLED.delay(200);
+  for (int i = 0; i < configuredStripLength * NUMBER_LEDSTRIP; i++) {
+    ledstrip.setPixel(i, r, g, b);
+    delay(40);
+    ledstrip.show();
+  }
+  Blink();
+  delay(2000);
+  ledstrip.clearAll();
+  ledstrip.show();
+}
+
+void Chaser() {
+  ChaserLedstripColor(BRIGHTNESS, 0, BRIGHTNESS);
+}
+
 static byte receivedByte;
 
 //Main loop of the programm gets called again and again.
 void loop() {
 
-  // run test if button is grounded
-  if (HasSetting(SettingsEnum::TEST_SWITCH) && digitalRead(TestPin)==LOW) { 
-      Test();
+  // TEST ROUTINES BUTTON DETECTION
+
+  if (HasSetting(SettingsEnum::TEST_SWITCH) && digitalRead(TestPin) == LOW) {
+    //Button pressed
+    if (buttonActive == false) {
+      buttonActive = true;
+      buttonTimer = millis();
+    }
+    if ((millis() - buttonTimer > longPressTime) && (longPressActive == false)) {
+      longPressActive = true;
+      Chaser();
+    }
+  } else {
+    if (buttonActive == true) {
+      if (longPressActive == true) {
+        longPressActive = false;
+      } else {
+        Test();
+      }
+      buttonActive = false;
+    }
   }
+
+  /*
+  // run test if button is grounded
+  if (HasSetting(SettingsEnum::TEST_SWITCH) && digitalRead(TestPin) == LOW) {
+    Test();
+  }*/
 
   //Check if data is available
   if (Serial.available() > 0) {
@@ -213,6 +264,11 @@ void loop() {
         Test();
         Ack();
         break;
+      case 'X':
+        //Launch a Test sequence
+        Chaser();
+        Ack();
+        break;
       default:
         // no unknown commands allowed. Send NACK (N)
         Nack();
@@ -229,15 +285,14 @@ void SetBlinkMode(int Mode) {
   BlinkModeTimeoutTimer = 0;
 }
 
-void ActivityLed(int activity)
-{
+void ActivityLed(int activity) {
   if (!HasSetting(SettingsEnum::ACTIVITY_LED)) {
     return;
   }
 
-  if (activity < 0){
+  if (activity < 0) {
     digitalWrite(LedPin, !digitalRead(LedPin));
-  } else{
+  } else {
     digitalWrite(LedPin, activity);
   }
 }
@@ -305,8 +360,8 @@ void Fill() {
   word firstLed = ReceiveWord();
   word numberOfLeds = ReceiveWord();
   int ColorData = ReceiveColorData();
-  if ( firstLed <= configuredStripLength * NUMBER_LEDSTRIP && numberOfLeds > 0 && firstLed + numberOfLeds - 1 <= configuredStripLength * NUMBER_LEDSTRIP ) {
-    ledstrip.setPixels(firstLed,numberOfLeds,ColorData);
+  if (firstLed <= configuredStripLength * NUMBER_LEDSTRIP && numberOfLeds > 0 && firstLed + numberOfLeds - 1 <= configuredStripLength * NUMBER_LEDSTRIP) {
+    ledstrip.setPixels(firstLed, numberOfLeds, ColorData);
     /*word endLedNr = firstLed + numberOfLeds;
     for (word ledNr = firstLed; ledNr < endLedNr; ledNr++) {
       ledstrip.setPixel(ledNr, ColorData);
@@ -323,22 +378,22 @@ void ReceiveCompressedData() {
   word firstLed = ReceiveWord();
   word numberOfCompressedData = ReceiveWord();
   word numberOfLeds = ReceiveWord();
-  if ( firstLed <= configuredStripLength * NUMBER_LEDSTRIP && numberOfLeds > 0 && firstLed + numberOfLeds - 1 <= configuredStripLength * NUMBER_LEDSTRIP ) {
+  if (firstLed <= configuredStripLength * NUMBER_LEDSTRIP && numberOfLeds > 0 && firstLed + numberOfLeds - 1 <= configuredStripLength * NUMBER_LEDSTRIP) {
     word startLed = firstLed;
     word endLedNr = firstLed + numberOfLeds;
-    for (word numPack = 0; numPack < numberOfCompressedData; numPack++){
-       while (!Serial.available()) {};
-       uint8_t nbLeds = (uint8_t)Serial.read();
-       int color = ReceiveColorData();
-       
-       for (word numLed = 0; numLed < nbLeds; numLed++){
-         ledstrip.setPixel(startLed + numLed, color);
-       }
-       startLed += nbLeds;
-       
-       if (startLed >= endLedNr){
-        break;        
-       }
+    for (word numPack = 0; numPack < numberOfCompressedData; numPack++) {
+      while (!Serial.available()) {};
+      uint8_t nbLeds = (uint8_t)Serial.read();
+      int color = ReceiveColorData();
+
+      for (word numLed = 0; numLed < nbLeds; numLed++) {
+        ledstrip.setPixel(startLed + numLed, color);
+      }
+      startLed += nbLeds;
+
+      if (startLed >= endLedNr) {
+        break;
+      }
     }
     Ack();
   } else {
@@ -352,7 +407,7 @@ void ReceiveCompressedData() {
 void ReceiveData() {
   word firstLed = ReceiveWord();
   word numberOfLeds = ReceiveWord();
-  if ( firstLed <= configuredStripLength * NUMBER_LEDSTRIP && numberOfLeds > 0 && firstLed + numberOfLeds - 1 <= configuredStripLength * NUMBER_LEDSTRIP ) {
+  if (firstLed <= configuredStripLength * NUMBER_LEDSTRIP && numberOfLeds > 0 && firstLed + numberOfLeds - 1 <= configuredStripLength * NUMBER_LEDSTRIP) {
     //FirstLedNr and numberOfLeds are valid.
     //Receive and set color data
     word endLedNr = firstLed + numberOfLeds;
@@ -386,16 +441,18 @@ void SetLedStripLength() {
 //Sets the length of a led strip
 void SetALedStripLength() {
   while (!Serial.available()) {};
-  byte indexStrip = Serial.read();  while (!Serial.available()) {};
+  byte indexStrip = Serial.read();
+  while (!Serial.available()) {};
   byte lastStrip = Serial.read();
   while (!Serial.available()) {};
   word stripLength = ReceiveWord();
   /*if (stripLength < 1 || stripLength > MaxLedsPerStrip ) {
     //stripLength is either to small or above the max number of ledstrip allowed or strip index is not within existing range
     Nack();
-  } else*/ {
+  } else*/
+  {
     //stripLength is in the valid range
-    ledstrip.addNewStrip(indexStrip,stripLength);
+    ledstrip.addNewStrip(indexStrip, stripLength);
     Ack();
   }
 }
@@ -403,16 +460,17 @@ void SetALedStripLength() {
 //Sets the brightness of a led strip
 void SetALedStripBrightness() {
   while (!Serial.available()) {};
-  byte indexStrip = Serial.read();  while (!Serial.available()) {};
+  byte indexStrip = Serial.read();
+  while (!Serial.available()) {};
   byte lastStrip = Serial.read();
   while (!Serial.available()) {};
   uint8_t brightness = Serial.read();
-  ledstrip.setStripBrightness(indexStrip,brightness);
+  ledstrip.setStripBrightness(indexStrip, brightness);
   Ack();
 }
 
 //Clears the data for all configured ledstrip
-void  ClearAllLedData() {
+void ClearAllLedData() {
   /*for (word ledNr = 0; ledNr < configuredStripLength * NUMBER_LEDSTRIP; ledNr++) {
     ledstrip.setPixel(ledNr, 0);
   }*/
