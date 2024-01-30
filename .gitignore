@@ -1,3 +1,10 @@
-
-.vscode/arduino.json
-build/*.*
+﻿APP_DATA
+log
+precompiled firmwares
+settings
+ESP.Easy.Flasher.exe
+esptool.exe
+Flash Firmware WS2812.bat
+build
+.vscode
+*.bin
