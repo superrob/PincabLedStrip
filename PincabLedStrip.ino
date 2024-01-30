@@ -157,43 +157,45 @@ void TestLedstripColor(byte r, byte g, byte b) {
   ledstrip.clearAll();
   ledstrip.show();
   ActivityLed(-1);
-  FastLED.delay(1);
+  delay(200);
   for (int i = 0; i < configuredStripLength * NUMBER_LEDSTRIP; i++) {
     ledstrip.setPixel(i, r, g, b);
     ActivityLed(-1);
   }
   ledstrip.show();
   ActivityLed(0);
-  FastLED.delay(1);
+  delay(200);
   ledstrip.clearAll();
   ledstrip.show();
 }
 
 void Test() {
-  TestLedstripColor(BRIGHTNESS, 0, 0);
-  TestLedstripColor(0, BRIGHTNESS, 0);
-  TestLedstripColor(0, 0, BRIGHTNESS);
+  TestLedstripColor(HALF_BRIGHTNESS, 0, 0); //RED
+  TestLedstripColor(0, HALF_BRIGHTNESS, 0); //GREEN
+  TestLedstripColor(0, 0, HALF_BRIGHTNESS); //BLUE
+  TestLedstripColor(HALF_BRIGHTNESS, HALF_BRIGHTNESS, 0); //YELLOW
+  TestLedstripColor(HALF_BRIGHTNESS, 0, HALF_BRIGHTNESS); //MAGENTA
+  TestLedstripColor(0, HALF_BRIGHTNESS, HALF_BRIGHTNESS); //CYAN
+  TestLedstripColor(HALF_BRIGHTNESS, HALF_BRIGHTNESS, HALF_BRIGHTNESS); //WHITE
 }
 
 void ChaserLedstripColor(byte r, byte g, byte b) {
   ledstrip.clearAll();
   ledstrip.show();
   ActivityLed(-1);
-  FastLED.delay(1);
   for (int i = 0; i < configuredStripLength * NUMBER_LEDSTRIP; i++) {
     ledstrip.setPixel(i, r, g, b);
-    FastLED.delay(1);
     ActivityLed(-1);
     ledstrip.show();
   }
   ActivityLed(0);
-  FastLED.delay(1);
+  delay(1000);
   ledstrip.clearAll();
   ledstrip.show();
 }
 
 void Chaser() {
-  ChaserLedstripColor(BRIGHTNESS, 0, BRIGHTNESS);
+  ChaserLedstripColor(HALF_BRIGHTNESS, 0, HALF_BRIGHTNESS);
 }
 
 static byte receivedByte;

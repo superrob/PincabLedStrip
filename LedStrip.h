@@ -83,31 +83,8 @@ FASTLED_USING_NAMESPACE
 
 #endif
 
-//Why 8 ports ? (example)
-//
-//PF right
-//PF left
-//Backpanel
-//Flipper MX
-//MagnaSave right
-//MagnaSave left
-//Undercab smart (or complex MX)
-//Speaker ring (maybe using undercab complex MX ?)
-
-//Define default Brightness settings - Those values now can be changed in cabinet.xml file like:
-//
-//<PerLedstripBrightness>160 255 255 0</PerLedstripBrightness>
-//Here first declared ledstrip will be lowered at 160, the two next ones will stay at full brightness, the last one will be disabled By default Wemos firmware create ledstrip at 255 brightness.
-//
-#define BRIGHTNESS 16        // Defines Brightness in RGB boot sequence - 16 its the minimum (1-15 strip don't iluminate at all)
-#define BRIGHTNESS_PIN1 255  // Defines Brightness in pin 1 (0 to 255)
-#define BRIGHTNESS_PIN2 255  // Defines Brightness in pin 2 (0 to 255)
-#define BRIGHTNESS_PIN3 255  // Defines Brightness in pin 3 (0 to 255)
-#define BRIGHTNESS_PIN4 255  // Defines Brightness in pin 4 (0 to 255)
-#define BRIGHTNESS_PIN5 255  // Defines Brightness in pin 5 (0 to 255)
-#define BRIGHTNESS_PIN6 255  // Defines Brightness in pin 6 (0 to 255)
-#define BRIGHTNESS_PIN7 255  // Defines Brightness in pin 7 (0 to 255)
-#define BRIGHTNESS_PIN8 255  // Defines Brightness in pin 8 (0 to 255)
+#define HALF_BRIGHTNESS 128  // Defines Brightness in RGB boot sequence - 16 its the minimum (1-15 strip don't iluminate at all)
+#define FULL_BRIGHTNESS 255  // Defines Brightness in pin 1 (0 to 255)
 /*************   END VALUE TO CHANGE  *******************/
 
 class LedStrip {
