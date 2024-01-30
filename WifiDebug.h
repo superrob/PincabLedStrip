@@ -1,6 +1,8 @@
 #ifndef WifiDebug_h
 #define WifiDebug_h
 
+#if defined(ESP8266)
+
 #include <String.h>
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
@@ -18,4 +20,6 @@ public:
 
 private:
 };
+#endif
+
 #endif

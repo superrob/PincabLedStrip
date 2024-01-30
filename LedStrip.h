@@ -15,16 +15,21 @@ FASTLED_USING_NAMESPACE
 //#define LED_TYPE    WS2812
 #define LED_TYPE WS2812B
 //#define LED_TYPE    WS2813
+
 //#define COLOR_ORDER RGB
 #define COLOR_ORDER GRB
 
 /*************   VALUE TO CHANGE  *******************/
-//Defines the max number of ledstrip which is allowed per ledstrip.
-#define MaxLedsPerStrip 1024
 //Defines the number of ledstrip
 #define NUMBER_LEDSTRIP 8
-//#define NUMBER_LEDSTRIP 7
 
+
+#define TEENSY (defined(__MK20DX128__) || defined(__MK20DX256__) || defined(__MK64FX512__) || defined(__MK66FX1M0__) || defined(__MKL26Z64__) || defined (__IMXRT1062__))
+
+#if defined(ESP8266)
+
+//Defines the max number of ledstrip which is allowed per ledstrip.
+#define MaxLedsPerStrip 1200
 //Ports in configtool vs ports in wemos
 //Configtool   =====   Wemos
 //1            =====   D5
@@ -42,8 +47,40 @@ FASTLED_USING_NAMESPACE
 #define DATA_PIN5 D1
 #define DATA_PIN6 D4
 #define DATA_PIN7 D2
-#if (NUMBER_LEDSTRIP == 8)
 #define DATA_PIN8 D3
+
+#elif defined(ESP32)
+
+//Defines the max number of ledstrip which is allowed per ledstrip.
+#define MaxLedsPerStrip 1200
+
+#define DATA_PIN1 7
+#define DATA_PIN2 9
+#define DATA_PIN3 11
+#define DATA_PIN4 12
+#define DATA_PIN5 35
+#define DATA_PIN6 16
+#define DATA_PIN7 33
+#define DATA_PIN8 18
+
+#elif TEENSY
+
+//Defines the max number of ledstrip which is allowed per ledstrip.
+#define MaxLedsPerStrip 1200
+
+#define DATA_PIN1 2
+#define DATA_PIN2 14
+#define DATA_PIN3 7
+#define DATA_PIN4 8
+#define DATA_PIN5 6
+#define DATA_PIN6 20
+#define DATA_PIN7 21
+#define DATA_PIN8 5
+
+#else
+
+#error "Unsupported Card Model"
+
 #endif
 
 //Why 8 ports ? (example)
@@ -70,9 +107,7 @@ FASTLED_USING_NAMESPACE
 #define BRIGHTNESS_PIN5 255  // Defines Brightness in pin 5 (0 to 255)
 #define BRIGHTNESS_PIN6 255  // Defines Brightness in pin 6 (0 to 255)
 #define BRIGHTNESS_PIN7 255  // Defines Brightness in pin 7 (0 to 255)
-#if (NUMBER_LEDSTRIP == 8)
 #define BRIGHTNESS_PIN8 255  // Defines Brightness in pin 8 (0 to 255)
-#endif
 /*************   END VALUE TO CHANGE  *******************/
 
 class LedStrip {

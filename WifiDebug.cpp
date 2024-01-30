@@ -1,5 +1,7 @@
 #include "WifiDebug.h"
 
+#if defined(ESP8266)
+
 WiFiUDP Udp;
 unsigned int serverUdpPort = 4210;
 const char* ssid = "XYZ";
@@ -51,3 +53,5 @@ void WifiDebug::debug_send_word(word w) {
   Udp.write(tampon);
   Udp.endPacket();
 }
+
+#endif

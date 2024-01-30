@@ -11,10 +11,12 @@
 #include <elapsedMillis.h>
 
 /***/
+#if defined(ESP8266)
 //#define DEBUG_ON_WIFI
 #ifdef DEBUG_ON_WIFI
 #include "WifiDebug.h"
 static WifiDebug wifidebug;
+#endif
 #endif
 /***/
 
@@ -24,9 +26,25 @@ static WifiDebug wifidebug;
 #define FirmwareVersionMinor 2
 
 //Defines the Pinnumber to which the built in led
-#define LedPin LED_BUILTIN
+// Defines the Pinnumber for the test button which is low when pressed
+#if defined(ESP8266)
+  #define TestPin D0
+  #define LedPin LED_BUILTIN
+#elif defined (ESP32)
+  #define TestPin 5
+  #define LedPin 15
+#elif TEENSY
+  #define TestPin 17
+  #define LedPin 13
+#else
+  #error "Unsupported Card Model"
+#endif
 
+#if TEENSY
 #define READ_EEPROM_SETTINGS 0
+#else
+#define READ_EEPROM_SETTINGS 1
+#endif
 
 enum SettingsEnum {
   TEST_ON_RESET,
@@ -41,7 +59,7 @@ enum SettingsEnum {
 };
 
 uint8_t Settings[SettingsEnum::COUNT] = {
-  0,
+  1,
   1,
   1,
   0,
@@ -72,9 +90,6 @@ bool HasSetting(int setting) {
   return Settings[setting] != 0;
 }
 
-// Defines the Pinnumber for the test button which is low when pressed
-#define TestPin D0
-
 // TEST double click settings
 long buttonTimer = 0;
 long longPressTime = 2000;
@@ -104,7 +119,7 @@ void setup() {
   ReadSettings();
 
   /**/
-#ifdef DEBUG_ON_WIFI
+#if DEBUG_ON_WIFI
   wifidebug.begin();
 #endif
   /**/
@@ -120,7 +135,7 @@ void setup() {
   SetBlinkMode(0);
   Blink();
 
-#ifdef DEBUG_ON_WIFI
+#if DEBUG_ON_WIFI
   wifidebug.debug_send_msg("Setup done");
 #endif
 
@@ -141,13 +156,14 @@ void setup() {
 void TestLedstripColor(byte r, byte g, byte b) {
   ledstrip.clearAll();
   ledstrip.show();
-  Blink();
+  ActivityLed(-1);
   FastLED.delay(200);
   for (int i = 0; i < configuredStripLength * NUMBER_LEDSTRIP; i++) {
     ledstrip.setPixel(i, r, g, b);
+    ActivityLed(-1);
   }
   ledstrip.show();
-  Blink();
+  ActivityLed(0);
   FastLED.delay(200);
   ledstrip.clearAll();
   ledstrip.show();
@@ -162,14 +178,15 @@ void Test() {
 void ChaserLedstripColor(byte r, byte g, byte b) {
   ledstrip.clearAll();
   ledstrip.show();
-  Blink();
+  ActivityLed(-1);
   FastLED.delay(200);
   for (int i = 0; i < configuredStripLength * NUMBER_LEDSTRIP; i++) {
     ledstrip.setPixel(i, r, g, b);
-    delay(40);
+    delay(10);
+    ActivityLed(-1);
     ledstrip.show();
   }
-  Blink();
+  ActivityLed(0);
   delay(2000);
   ledstrip.clearAll();
   ledstrip.show();
@@ -262,11 +279,6 @@ void loop() {
       case 'T':
         //Launch a Test sequence
         Test();
-        Ack();
-        break;
-      case 'X':
-        //Launch a Test sequence
-        Chaser();
         Ack();
         break;
       default:
