@@ -59,7 +59,7 @@ enum SettingsEnum {
 };
 
 uint8_t Settings[SettingsEnum::COUNT] = {
-  1,
+  0,
   1,
   1,
   0,
@@ -132,8 +132,6 @@ void setup() {
   //Initialize the led pin
   pinMode(LedPin, OUTPUT);
   digitalWrite(LedPin, LOW);
-  SetBlinkMode(0);
-  Blink();
 
 #if DEBUG_ON_WIFI
   wifidebug.debug_send_msg("Setup done");
@@ -151,20 +149,22 @@ void setup() {
 
   ClearAllLedData();
   ledstrip.show();
+  SetBlinkMode(0);
+  Blink();
 }
 
 void TestLedstripColor(byte r, byte g, byte b) {
   ledstrip.clearAll();
   ledstrip.show();
   ActivityLed(-1);
-  FastLED.delay(200);
+  FastLED.delay(1);
   for (int i = 0; i < configuredStripLength * NUMBER_LEDSTRIP; i++) {
     ledstrip.setPixel(i, r, g, b);
     ActivityLed(-1);
   }
   ledstrip.show();
   ActivityLed(0);
-  FastLED.delay(200);
+  FastLED.delay(1);
   ledstrip.clearAll();
   ledstrip.show();
 }
@@ -179,15 +179,15 @@ void ChaserLedstripColor(byte r, byte g, byte b) {
   ledstrip.clearAll();
   ledstrip.show();
   ActivityLed(-1);
-  FastLED.delay(200);
+  FastLED.delay(1);
   for (int i = 0; i < configuredStripLength * NUMBER_LEDSTRIP; i++) {
     ledstrip.setPixel(i, r, g, b);
-    delay(10);
+    FastLED.delay(1);
     ActivityLed(-1);
     ledstrip.show();
   }
   ActivityLed(0);
-  delay(2000);
+  FastLED.delay(1);
   ledstrip.clearAll();
   ledstrip.show();
 }
