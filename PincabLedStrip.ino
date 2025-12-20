@@ -7,7 +7,9 @@
 
 #define SERIAL_BUFFER_SIZE 2048
 
-#include <EEPROM.h>
+#if !defined(ARDUINO_ARCH_RP2040)
+  #include <EEPROM.h>
+#endif
 #include <elapsedMillis.h>
 
 /***/
@@ -33,6 +35,9 @@ static WifiDebug wifidebug;
 #elif defined (ESP32)
   #define TestPin 5
   #define LedPin 15
+#elif defined (ARDUINO_ARCH_RP2040)
+  #define TestPin 15
+  #define LedPin 25
 #elif TEENSY
   #define TestPin 17
   #define LedPin 13
@@ -40,7 +45,7 @@ static WifiDebug wifidebug;
   #error "Unsupported Card Model"
 #endif
 
-#if TEENSY
+#if TEENSY || defined (PICO_RP2040)
 #define READ_EEPROM_SETTINGS 0
 #else
 #define READ_EEPROM_SETTINGS 1

@@ -63,6 +63,19 @@ FASTLED_USING_NAMESPACE
 #define DATA_PIN7 33
 #define DATA_PIN8 18
 
+#elif defined(ARDUINO_ARCH_RP2040)
+
+#define MaxLedsPerStrip 1200
+
+#define DATA_PIN1 0
+#define DATA_PIN2 1
+#define DATA_PIN3 2
+#define DATA_PIN4 3
+#define DATA_PIN5 4
+#define DATA_PIN6 5
+#define DATA_PIN7 6
+#define DATA_PIN8 7
+
 #elif TEENSY
 
 //Defines the max number of ledstrip which is allowed per ledstrip.

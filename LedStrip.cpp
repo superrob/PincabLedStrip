@@ -25,7 +25,7 @@ void LedStrip::begin(void) {
     stripStartOffset[j] = offset;
     for (int i = 0; i < stripTotalLen; i++) stripIndex[offset++] = j;
   }
-  //6 led strips, hardcoded
+  //8 led strips, hardcoded
   CRGB FullWhite(FULL_BRIGHTNESS, FULL_BRIGHTNESS, FULL_BRIGHTNESS);
   FastLED.addLeds<LED_TYPE, DATA_PIN1, COLOR_ORDER>(leds[0], MaxLedsPerStrip).setCorrection(FullWhite);
   FastLED.addLeds<LED_TYPE, DATA_PIN2, COLOR_ORDER>(leds[1], MaxLedsPerStrip).setCorrection(FullWhite);
