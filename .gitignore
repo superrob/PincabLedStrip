@@ -5,6 +5,9 @@ settings
 ESP.Easy.Flasher.exe
 esptool.exe
 Flash Firmware WS2812.bat
-build
 .vscode
 *.bin
+build/arduino.mbed_rp2040.pico/PincabLedStrip.ino.elf
+build/arduino.mbed_rp2040.pico/PincabLedStrip.ino.elf.uf2
+build/arduino.mbed_rp2040.pico/PincabLedStrip.ino.hex
+build/arduino.mbed_rp2040.pico/PincabLedStrip.ino.map
