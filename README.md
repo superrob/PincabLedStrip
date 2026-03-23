@@ -7,16 +7,17 @@ Firmware for common microcontrollers to drive adressable LEDs together with DOF 
 - RP2040 (Raspberry Pi Pico)
 - Teensy
 
-Look into Setting.h for information about the default pin configurations for each micro.
+Look into [Settings.h](Settings.h) for information about the default pin configurations for each micro.
+
+# Compiling
+Download the repository and open PincapLedStrip.ino in the Arduino IDE.
+You will need to download the board definitions for your chosen microcontroller and the following libaries:
+- FastLED
+- elapsedMillis
 
 # Important cabinet.xml notes
 The firmware uses the WemosD1MPStripController in DirectOutput.
 In you **cabinet.xml**, you'll have to change the **\<TeensyStripController>\</TeesyStripController>** headers to **\<WemosD1MPStripController>\</WemosD1MPStripController>** to make it work.
-Additionally you will need the following settings in the 
-
-
-# Important notes
-Currently requires a patched DOF, the below won't work on existing one. Please use the **DirectOutput.DLL** from this repository
 
 Your **cabinet.xml** file needs also to be adapted to use a 2Mbs serial connection & to activate a new feature (PerLedstripLength)
 
@@ -28,15 +29,15 @@ There is also now the possibility to use compressed ledstrip data sent to the mi
 
 	<UseCompression>true</UseCompression>
 
-Ledstrip brightness:
+### Ledstrip brightness
 
 You can also set the brightness values per ledstrips with the new DirectOutput.dll provided.
-Just add this setup to any of your <LedStrip> descriptors in cabinet .xml
+Just add this setup to any of your \<LedStrip> descriptors in cabinet .xml
 You don't need to change any brightness anymore in the firmware.
 
-<Brightness>value</Brightness> where value is the brightness in percent, so 0 to 100 values are accepted, default is 100
+\<Brightness>value\</Brightness> where value is the brightness in percent, so 0 to 100 values are accepted, default is 100
 	
-# Test Command
+### Test Command
 
 The usual RGB test at boot can now be triggered in other ways
 - enabling the TEST_ON_RESET define in PincabLedstrip.ino to have it trigerred on each Wemos reset
