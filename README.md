@@ -4,7 +4,7 @@ Firmware for common microcontrollers to drive adressable LEDs together with DOF 
 # Supported Microcontrollers
 - ESP8266 (Wemos D1 Mini)
 - ESP32 (Wemos S2 Mini)
-- RP2040 (Raspberry Pi Pico)
+- RP2040 (Raspberry Pi Pico) [Precompiled .uf2 file](/precompiled/PincabLedStrip.ino.uf2)
 - Teensy
 
 Look into [Settings.h](Settings.h) for information about the default pin configurations for each micro.
