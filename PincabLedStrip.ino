@@ -4,8 +4,7 @@
 /*
  * This code is fully compatible with WEMOS D1 PRO
  */
-
-#define SERIAL_BUFFER_SIZE 2048
+#include "Settings.h"
 
 #if !defined(ARDUINO_ARCH_RP2040)
   #include <EEPROM.h>
@@ -14,64 +13,20 @@
 
 /***/
 #if defined(ESP8266)
-//#define DEBUG_ON_WIFI
-#ifdef DEBUG_ON_WIFI
-#include "WifiDebug.h"
-static WifiDebug wifidebug;
-#endif
+  //#define DEBUG_ON_WIFI
+  #ifdef DEBUG_ON_WIFI
+    #include "WifiDebug.h"
+    static WifiDebug wifidebug;
+  #endif
 #endif
 /***/
 
 #include "LedStrip.h"
 
-#define FirmwareVersionMajor 2
-#define FirmwareVersionMinor 2
-
-//Defines the Pinnumber to which the built in led
-// Defines the Pinnumber for the test button which is low when pressed
-#if defined(ESP8266)
-  #define TestPin D0
-  #define LedPin LED_BUILTIN
-#elif defined (ESP32)
-  #define TestPin 5
-  #define LedPin 15
-#elif defined (ARDUINO_ARCH_RP2040)
-  #define TestPin 15
-  #define LedPin 25
-#elif TEENSY
-  #define TestPin 17
-  #define LedPin 13
-#else
-  #error "Unsupported Card Model"
-#endif
-
-#if TEENSY || defined (PICO_RP2040)
-#define READ_EEPROM_SETTINGS 0
-#else
-#define READ_EEPROM_SETTINGS 1
-#endif
-
-enum SettingsEnum {
-  TEST_ON_RESET,
-  TEST_SWITCH,
-  ACTIVITY_LED,
-  SETTING4,
-  SETTING5,
-  SETTING6,
-  SETTING7,
-  SETTING8,
-  COUNT
-};
-
 uint8_t Settings[SettingsEnum::COUNT] = {
-  0,
-  1,
-  1,
-  0,
-  0,
-  0,
-  0,
-  0
+  ENABLE_TEST_ON_RESET,
+  ENABLE_TEST_SWITCH,
+  ENABLE_ACTIVITY_LED
 };
 
 void ReadSettings() {

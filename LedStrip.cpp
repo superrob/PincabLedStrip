@@ -1,4 +1,5 @@
 #include <string.h>
+#include "Settings.h"
 #include "LedStrip.h"
 
 
