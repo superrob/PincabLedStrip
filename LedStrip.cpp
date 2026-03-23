@@ -2,7 +2,6 @@
 #include "Settings.h"
 #include "LedStrip.h"
 
-
 uint16_t LedStrip::stripTotalLen;
 uint16_t LedStrip::stripLen[NUMBER_LEDSTRIP];
 uint16_t LedStrip::stripStartOffset[NUMBER_LEDSTRIP];
@@ -21,22 +20,13 @@ LedStrip::LedStrip(uint32_t numPerStrip) {
 
 void LedStrip::begin(void) {
   int offset = 0;
+  CRGB FullWhite(FULL_BRIGHTNESS, FULL_BRIGHTNESS, FULL_BRIGHTNESS);
   for (int j = 0; j < NUMBER_LEDSTRIP; j++) {
     stripLen[j] = MaxLedsPerStrip;
     stripStartOffset[j] = offset;
+    FastLED.addLeds<LED_TYPE, DATA_PIN1, COLOR_ORDER>(leds[j], MaxLedsPerStrip).setCorrection(FullWhite);
     for (int i = 0; i < stripTotalLen; i++) stripIndex[offset++] = j;
   }
-  //8 led strips, hardcoded
-  CRGB FullWhite(FULL_BRIGHTNESS, FULL_BRIGHTNESS, FULL_BRIGHTNESS);
-  FastLED.addLeds<LED_TYPE, DATA_PIN1, COLOR_ORDER>(leds[0], MaxLedsPerStrip).setCorrection(FullWhite);
-  FastLED.addLeds<LED_TYPE, DATA_PIN2, COLOR_ORDER>(leds[1], MaxLedsPerStrip).setCorrection(FullWhite);
-  FastLED.addLeds<LED_TYPE, DATA_PIN3, COLOR_ORDER>(leds[2], MaxLedsPerStrip).setCorrection(FullWhite);
-  FastLED.addLeds<LED_TYPE, DATA_PIN4, COLOR_ORDER>(leds[3], MaxLedsPerStrip).setCorrection(FullWhite);
-  FastLED.addLeds<LED_TYPE, DATA_PIN5, COLOR_ORDER>(leds[4], MaxLedsPerStrip).setCorrection(FullWhite);
-  FastLED.addLeds<LED_TYPE, DATA_PIN6, COLOR_ORDER>(leds[5], MaxLedsPerStrip).setCorrection(FullWhite);
-  FastLED.addLeds<LED_TYPE, DATA_PIN7, COLOR_ORDER>(leds[6], MaxLedsPerStrip).setCorrection(FullWhite);
-  FastLED.addLeds<LED_TYPE, DATA_PIN8, COLOR_ORDER>(leds[7], MaxLedsPerStrip).setCorrection(FullWhite);
-
   //FastLED.setBrightness( BRIGHTNESS );
   FastLED.setDither(0);
 }
